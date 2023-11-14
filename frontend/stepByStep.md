@@ -1,0 +1,12 @@
+- Install the libraries 
+    - vue-router@4
+    - vue-axios axios
+    - pinia
+    - pinia-plugin-persistence
+    - bootstrap
+    - @popperjs/core
+- Config the file router
+- Config the main.js with libraries
+- Build the views Register, Login, Dashboard
+- Create the navbar and apply the router 
+- Generate the new Routes 
