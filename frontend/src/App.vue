@@ -5,5 +5,6 @@
 
 // En tu componente
 <script setup>
-  import Navbar from './components/layouts/Navbar.vue'
+  import Navbar from './components/layouts/navbar.vue'
+
 </script>
