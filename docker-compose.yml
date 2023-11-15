@@ -1,0 +1,86 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: database
+    image: postgres:16rc1
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=practice
+    restart: "always"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    networks:
+      - practice
+    volumes:
+      - "./database:/var/lib/postgresql/data"
+    deploy:
+      resources:
+        limits:
+          memory: "300m"
+          cpus: "0.3"
+        reservations:
+          memory: "100m"
+          cpus: "0.2"
+  
+  backend:
+    container_name: backend
+    build: 
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./backend:/home/src
+    command: "python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - practice
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: "always"
+    deploy:
+      resources:
+        limits:
+          memory: "200m"
+          cpus: "0.3"
+        reservations:
+          memory: "50m"
+          cpus: "0.2"
+  
+  #frontend:
+  #  build:
+  #  container_name: frontend
+  #    context: ./frontend
+  #  ports:
+  #    - "5173:5173"  # Map port 5173 to the host
+  #  depends_on:
+  #    backend:
+  #      condition: service_healthy
+  #  volumes:
+  #    - "./frontend:/home/src"
+  #  networks:
+  #    - practice
+  #  command: "npm run dev --host 0.0.0.0 --port 5173"
+  #  restart: "always"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: "100m"
+  #        cpus: "0.3"
+  #      reservations:
+  #        memory: "50m"
+  #        cpus: "0.2"
+
+networks:
+  practice: {}
